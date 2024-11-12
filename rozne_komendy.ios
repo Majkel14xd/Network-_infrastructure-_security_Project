@@ -1,0 +1,135 @@
+interface GigabitEthernet0/0/0.90
+ encapsulation dot1Q 90
+ ip address 199.199.90.1 255.255.255.0
+ standby 1 ip 199.199.90.3
+ standby 1 priority 150
+ standby 1 preempt
+
+
+ interface GigabitEthernet0/0/0.40
+ encapsulation dot1Q 40
+ ip address 192.168.40.1 255.255.255.0
+ ip nat inside
+ standby 2 ip 192.168.40.3 
+ standby 2 priority 150
+ standby 2 preempt
+
+
+  interface GigabitEthernet0/0/0.10
+ encapsulation dot1Q 10
+ ip address 192.168.10.1 255.255.255.0
+  ip nat inside
+ standby 3 ip 192.168.10.3 
+ standby 3 priority 100
+ standby 3 preempt
+
+
+  interface GigabitEthernet0/0/0.20
+ encapsulation dot1Q 20
+ ip address 192.168.20.1 255.255.255.0
+  ip nat inside
+ standby 4 ip 192.168.20.3 
+ standby 4 priority 100
+ standby 4 preempt
+
+  interface GigabitEthernet0/0/0.30
+ encapsulation dot1Q 30
+ ip address 192.168.30.1 255.255.255.0
+  ip nat inside
+ standby 5 ip 192.168.30.3 
+ standby 5 priority 100
+ standby 5 preempt
+
+
+
+
+
+ interface Loopback1
+ ip address 10.0.0.1 255.255.255.0
+!
+interface Tunnel1
+ ip address 172.16.0.1 255.255.255.0
+ mtu 1476
+ tunnel source Loopback1
+ tunnel destination 10.0.0.2
+
+ !
+
+ ip nat inside source list 1 interface Serial0/1/1 overload
+access-list 1 permit 192.168.10.0 0.0.0.255
+access-list 1 permit 192.168.20.0 0.0.0.255
+access-list 1 permit 192.168.30.0 0.0.0.255
+access-list 1 permit 192.168.40.0 0.0.0.255
+
+
+ip dhcp excluded-address 199.199.90.1 199.199.90.3
+ip dhcp excluded-address 199.199.90.124 199.199.90.253
+ip dhcp excluded-address 192.168.10.1 192.168.10.3
+ip dhcp excluded-address 192.168.10.124 192.168.10.253
+ip dhcp excluded-address 192.168.20.1 192.168.20.3
+ip dhcp excluded-address 192.168.20.124 192.168.20.253
+ip dhcp excluded-address 192.168.30.1 192.168.30.3
+ip dhcp excluded-address 192.168.30.124 192.168.30.253
+ip dhcp excluded-address 192.168.40.1 192.168.40.3
+ip dhcp excluded-address 192.168.40.124 192.168.40.253
+
+
+
+
+ip dhcp pool ADMIN
+ network 199.199.90.0 255.255.255.0
+ default-router 199.199.90.3
+ip dhcp pool Sklep
+ network 192.168.10.0 255.255.255.0
+ default-router 192.168.10.3
+ ip dhcp pool E_COMMARCE
+ network 192.168.20.0 255.255.255.0
+ default-router 192.168.40.3
+ ip dhcp pool Kierownictwo
+ network 192.168.30.0 255.255.255.0
+ default-router 192.168.40.3
+ip dhcp pool Zarzad
+ network 192.168.40.0 255.255.255.0
+ default-router 192.168.40.3
+
+ ip dhcp snooping vlan 1
+ip dhcp snooping
+
+
+
+
+
+router eigrp 5000
+ eigrp router-id 1.1.1.1
+ redistribute bgp 1005 metric 100 1 255 1 1500 
+ network 81.26.4.8 0.0.0.3
+ network 110.22.40.0 0.0.0.3
+!
+router bgp 1005
+ bgp log-neighbor-changes
+ no synchronization
+ neighbor 110.22.40.2 remote-as 1006
+ network 81.26.4.8 mask 255.255.255.252
+ network 110.22.40.0 mask 255.255.255.252
+ redistribute eigrp 5000 
+
+ 
+ router bgp 1006
+ bgp log-neighbor-changes
+ no synchronization
+ neighbor 110.22.40.1  remote-as 1005
+ network 110.22.40.0 mask 255.255.255.252
+ network 199.180.22.0 mask 255.255.255.0
+
+
+ router eigrp 5000
+ redistribute ospf 4000 metric 100 1 255 1 1500 
+ network 81.26.4.12 0.0.0.3
+ network 90.50.7.0 0.0.0.3
+!
+router ospf 4000
+ log-adjacency-changes
+ network 90.50.7.0 0.0.0.3 area 0
+ network 222.221.33.1 0.0.0.255 area 0
+ network 222.221.44.1 0.0.0.255 area 0
+!
