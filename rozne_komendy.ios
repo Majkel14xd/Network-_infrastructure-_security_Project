@@ -133,3 +133,26 @@ router ospf 4000
  network 222.221.33.1 0.0.0.255 area 0
  network 222.221.44.1 0.0.0.255 area 0
 !
+
+
+router eigrp 5000
+ eigrp router-id 2.2.2.2
+ redistribute bgp 1002 metric 100 1 255 1 1500 
+ network 81.26.4.4 0.0.0.3
+ network 88.5.10.4 0.0.0.3
+
+
+router eigrp 5000
+ eigrp router-id 3.3.3.3
+ redistribute bgp 1005 metric 100 1 255 1 1500 
+ network 81.26.4.8 0.0.0.3
+ network 110.22.40.0 0.0.0.3
+
+_A
+IP_ADDRESS=192.168.1.3
+IP_SUBNET_MASK=255.255.255.0
+DEFAULT_GATEWAY=192.168.1.2
+TFTP_SERVER=192.168.1.2
+TFTP_FILE=c1841-ipbase-mz.123-14.T7.bin
+TFTP_CHECKSUM=0
+tftpdnld
